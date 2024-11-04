@@ -8,6 +8,10 @@ import org.jetbrains.kotlin.idea.KotlinDocumentationProvider
 /**
  * Fixes [this issue](https://youtrack.jetbrains.com/issue/KTIJ-13687/KDoc-support-inline-images).
  *
+ * ![256x75 Extended FAB image](file:C:\Users\pchol\IdeaProjects\kelp\painting.png)
+ * ![256x75 Extended FAB image](file:\Users\pchol\IdeaProjects\kelp\painting.png)
+ * ![256x75 Extended FAB image](file:.\painting.png)
+ *
  * @see README.md
  */
 internal class KDocImageDocumentationProvider(
@@ -18,12 +22,15 @@ internal class KDocImageDocumentationProvider(
         "!<a href=['\"](?<url>.*?)['\"]>((?<width>\\d+)?x(?<height>\\d+)?)?(?<alt>.*?)</a>".toRegex()
 
     override fun generateRenderedDoc(comment: PsiDocCommentBase): String? =
-        delegate.generateRenderedDoc(comment)?.let(::renderKdocImages)
+        delegate.generateRenderedDoc(comment)?.let { renderKdocImages(it, getFilePath(comment)) }
+
+    private fun getFilePath(psiElement: PsiElement?) =
+        psiElement?.containingFile?.virtualFile?.path
 
     override fun generateDoc(element: PsiElement?, originalElement: PsiElement?): String? =
-        delegate.generateDoc(element, originalElement)?.let(::renderKdocImages)
+        delegate.generateDoc(element, originalElement)?.let { renderKdocImages(it, getFilePath(element)) }
 
-    private fun renderKdocImages(kotlinDoc: String): String {
+    private fun renderKdocImages(kotlinDoc: String, path: String?): String {
         val replace = kotlinDoc.replace(kdocImageRegex) {
             val url = it.groups["url"]?.value ?: return@replace it.value
             val width = it.groups["width"]?.value?.toIntOrNull()

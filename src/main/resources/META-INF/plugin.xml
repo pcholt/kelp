@@ -30,7 +30,7 @@
                                         implementationClass="ru.ozon.ideplugin.kelp.demoApp.DsComponentInDemoAppLineMarker"/>
 
         <documentationProvider order="first"
-                               implementationClass="ru.ozon.ideplugin.kelp.KDocImageDocumentationProvider"/>
+                               implementation="ru.ozon.ideplugin.kelp.KDocImageDocumentationProvider"/>
 
         <intentionAction>
             <language>kotlin</language>
